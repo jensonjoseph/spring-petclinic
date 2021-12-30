@@ -14,6 +14,11 @@ cd spring-petclinic
 java -jar target/*.jar
 ```
 
+## Running petclinic as docker container locally
+```aidl
+docker build -t my-pet-clinic:1.1 .
+docker run -p 8081:8081 my-pet-clinic:1.1
+```
 You can then access petclinic here: http://localhost:8080/
 
 <img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
