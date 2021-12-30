@@ -1,13 +1,13 @@
 pipeline {
     agent any
     environment {
-        maven-image = "maven:3-openjdk-11-slim"
+        MAVEN_IMAGE = "maven:3-openjdk-11-slim"
     }
     stages {
         stage('Build') {
             agent {
                 docker {
-                    image "${maven-image}"
+                    image "${MAVEN_IMAGE}"
                     args '-v $HOME/.m2:/root/.m2'
                 }
             }
@@ -26,7 +26,7 @@ pipeline {
         stage('Test') {
             agent {
                 docker {
-                    image "${maven-image}"
+                    image "${MAVEN_IMAGE}"
                     args '-v $HOME/.m2:/root/.m2'
                 }
             }
@@ -43,7 +43,7 @@ pipeline {
         stage('Deliver') {
             agent {
                 docker {
-                    image "${maven-image}"
+                    image "${MAVEN_IMAGE}"
                     args '-v $HOME/.m2:/root/.m2'
                 }
             }
