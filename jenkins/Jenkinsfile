@@ -5,7 +5,7 @@ pipeline {
         GIT_TAG = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
         PROJECT_VERSION = readMavenPom().getParent().getVersion().trim()
         DATE = sh(returnStdout: true, script: "date '+%y%m%d'").trim()
-        registryCredential= "jensondocker"
+        registryCredential = "jensondocker"
     }
     stages {
         stage('Build') {
@@ -18,7 +18,7 @@ pipeline {
             steps {
                 sh 'mvn -B -DskipTests clean package'
                 stash includes: 'target/*.jar', name: 'JAR'
-                stash includes:'Dockerfile', name: 'DOCKER_FILE'
+                stash includes: 'Dockerfile', name: 'DOCKER_FILE'
             }
             post {
                 success {
@@ -72,6 +72,7 @@ pipeline {
                         dockerImage = docker.build "jensonjoseph/spring-petclinic:${PROJECT_VERSION}-${DATE}-${GIT_TAG}"
                         dockerImage.push()
                     }
+                }
             }
         }
     }
