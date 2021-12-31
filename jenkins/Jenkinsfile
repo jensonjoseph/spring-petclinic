@@ -3,7 +3,7 @@ pipeline {
     environment {
         MAVEN_IMAGE = "maven:3-openjdk-11-slim"
         GIT_TAG = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-        PROJECT_VERSION = readMavenPom().getParent().getVersion().trim()
+        PROJECT_VERSION = readMavenPom().getVersion().trim()
         DATE = sh(returnStdout: true, script: "date '+%y%m%d'").trim()
         registryCredential = "jensondocker"
     }
