@@ -15,7 +15,7 @@ java -jar target/*.jar
 ```
 
 ## Running petclinic as docker container locally
-```aidl
+```
 docker build -t my-pet-clinic:1.1 .
 docker run -p 8081:8081 my-pet-clinic:1.1
 ```

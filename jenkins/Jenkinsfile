@@ -2,6 +2,10 @@ pipeline {
     agent any
     environment {
         MAVEN_IMAGE = "maven:3-openjdk-11-slim"
+        GIT_TAG = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+        PROJECT_VERSION = readMavenPom().getParent().getVersion().trim()
+        DATE = sh(returnStdout: true, script: "date '+%y%m%d'").trim()
+        registryCredential= "jensondocker"
     }
     stages {
         stage('Build') {
@@ -13,6 +17,8 @@ pipeline {
             }
             steps {
                 sh 'mvn -B -DskipTests clean package'
+                stash includes: 'target/*.jar', name: 'JAR'
+                stash includes:'Dockerfile', name: 'DOCKER_FILE'
             }
             post {
                 success {
@@ -54,6 +60,18 @@ pipeline {
                 always {
                     archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
                 }
+            }
+        }
+        stage('Dockerize and publish') {
+            agent any
+            steps {
+                unstash 'JAR'
+                unstash 'DOCKER_FILE'
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        dockerImage = docker.build "jensonjoseph/spring-petclinic:${PROJECT_VERSION}-${DATE}-${GIT_TAG}"
+                        dockerImage.push()
+                    }
             }
         }
     }
