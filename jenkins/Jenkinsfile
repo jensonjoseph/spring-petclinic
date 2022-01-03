@@ -1,5 +1,4 @@
 pipeline {
-    agent any
     environment {
         MAVEN_IMAGE = "maven:3-openjdk-11-slim"
         GIT_TAG = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
@@ -7,14 +6,15 @@ pipeline {
         DATE = sh(returnStdout: true, script: "date '+%y%m%d'").trim()
         registryCredential = "jensondocker"
     }
+    agent {
+        docker {
+            image "${MAVEN_IMAGE}"
+            args '-v $HOME/.m2:/root/.m2'
+        }
+    }
+
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
             steps {
                 sh 'mvn -B -DskipTests clean package'
                 stash includes: 'target/*.jar', name: 'JAR'
@@ -30,12 +30,6 @@ pipeline {
             }
         }
         stage('Test') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
             steps {
                 sh 'mvn test'
                 jacoco()
@@ -47,12 +41,6 @@ pipeline {
             }
         }
         stage('Deliver') {
-            agent {
-                docker {
-                    image "${MAVEN_IMAGE}"
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
             steps {
                 sh './jenkins/scripts/deliver.sh'
             }
@@ -63,7 +51,6 @@ pipeline {
             }
         }
         stage('Dockerize and publish') {
-            agent any
             steps {
                 unstash 'JAR'
                 unstash 'DOCKER_FILE'
