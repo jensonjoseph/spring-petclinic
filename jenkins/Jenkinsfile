@@ -8,8 +8,9 @@ pipeline {
     }
     agent {
         docker {
-            image "${MAVEN_IMAGE}"
+            image "maven:3-openjdk-11-slim"
             args '-v $HOME/.m2:/root/.m2'
+            reuseNode true
         }
     }
 
